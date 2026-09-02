@@ -1,1 +1,0 @@
-"""Mock files directory."""

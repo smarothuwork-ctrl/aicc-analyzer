@@ -1,0 +1,18 @@
+openapi: 3.0.0
+info:
+  title: contract-compliance-check-orchestrator-cccodr
+  description: orchestrator for contract compliance check
+  version: 0.1.0
+paths:
+  /:
+    get:
+      summary: Root endpoint
+      responses:
+        '200':
+          description: Successful response
+  /health:
+    get:
+      summary: Health check endpoint
+      responses:
+        '200':
+          description: Service is healthy

@@ -1,1 +1,0 @@
-"""Integration Karate BDD tests."""

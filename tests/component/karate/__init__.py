@@ -1,1 +1,0 @@
-"""Component Karate BDD tests."""
