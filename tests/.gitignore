@@ -1,0 +1,4 @@
+# Ignore pycache in tests
+__pycache__/
+*.py[cod]
+*$py.class
