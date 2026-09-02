@@ -1,0 +1,3 @@
+app_name: aicc-analyzer
+environment: dev
+max_documents_per_job: 10
