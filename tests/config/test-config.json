@@ -1,9 +1,31 @@
 {
-  "test": {
-    "environment": "test",
-    "database": {
-      "host": "localhost",
-      "port": 5432
-    }
-  }
+ "_comment": "Configuration for local_runner_lib. See: https://artifactory.tfs.toyota.com/devops-pypi-prod-local/local_runner_lib",
+ "_format": "testSets array defines test configurations. Each testSet specifies feature file locations and test type.",
+ "_variables": "local_runner_lib injects 'urlBase' variable into Karate tests pointing to the running application",
+ "testSets": [
+ {
+ "testSetEnabled": true,
+ "testSetType": "Component",
+ "featureFileDirectory": "tests/component/karate/features",
+ "featureFiles": [],
+ "ignoreFeatureFiles": [],
+ "scenarioName": "",
+ "qTestConfig": {
+ "qTestCycle": null,
+ "qTestProjectId": null
+ }
+ },
+ {
+ "testSetEnabled": true,
+ "testSetType": "Integration",
+ "featureFileDirectory": "tests/integration/karate/features",
+ "featureFiles": [],
+ "ignoreFeatureFiles": [],
+ "scenarioName": "",
+ "qTestConfig": {
+ "qTestCycle": null,
+ "qTestProjectId": null
+ }
+ }
+ ]
 }
