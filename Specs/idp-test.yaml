@@ -1,0 +1,78 @@
+---
+apiVersion: aicc/v1
+kind: Component
+metadata:
+  name: aicc-analyzer
+  namespace: aicc
+  version: 0.1.0
+  description: Analyzer Service for Contract Compliance Evaluation Platform
+  component_shortname: aicc-analyzer
+  environment: test
+  owner: AICC_Team
+  appcode: aicc-analyzer
+
+spec:
+  aws:
+    account_id: "106573904847"
+    rolenames:
+      - aicc-analyzer-role-test
+      - aicc-analyzer-task-role-test
+    alb:
+      app_healthcheck_path: /analyzer/health
+      app_context_path: /analyzer/*
+      healthy_threshold: 2
+      unhealthy_threshold: 2
+    regions:
+      - region: us-east-1
+        subnets:
+          - subnet-0de1d95fcab5482d9
+          - subnet-012cdc86dd7cdb070
+        security_groups:
+          - sg-027c05e94fb382c8
+
+  environment_variables:
+    DT_TAGS: "env:test region:us-east-1 AppCode:aicc-analyzer AccountID:106573904847"
+    DT_TENANT: "fs12101"
+    DT_LOGLEVELCON: "debug"
+    cluster_name: aicc-ecs-test
+    service_name: aicc-analyzer-test
+    task_cpu: 512
+    task_memory: 1024
+    desired_count: 1
+    container:
+      name: aicc-analyzer-test
+      port: 8080
+    ENVIRONMENT: test
+    DB_HOST_NAME_PORT: "aicc-analyzer-test-rds.cluster-c0h2uoq1da.us-east-1.rds.amazonaws.com:5432"
+    DB_NAME: "analyzer_db_test"
+    DB_USERNAME: "analyzer-test-task-role"
+
+  autoscaling:
+    enabled: false
+    min_capacity: 1
+    max_capacity: 2
+
+  database:
+    enable_db_migration: true
+    migration_tool: "liquibase"
+    host: "aicc-analyzer-test-rds.cluster-c0h2uoq1da.us-east-1.rds.amazonaws.com"
+    dbname: "analyzer_db_test"
+    schema: "analyzer_schema"
+    username: "analyzer-test-task-role"
+    port: 5432
+    region: us-east-1
+    liquibase_changelog_file: "changelog-master.xml"
+
+  sqs:
+    analyzer_queue: aicc-analyzer-queue-test
+    status_queue: aicc-status-queue-test
+    audit_queue: aicc-audit-queue-test
+    dlq_max_receive_count: 2
+
+  s3:
+    contract_documents_bucket: aicc-contract-documents-test
+    documents_prefix: contract-docs/
+    kms_encryption: true
+
+  dynamodb:
+    execution_state_table: evaluation_execution_state_test
