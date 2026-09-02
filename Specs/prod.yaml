@@ -1,0 +1,172 @@
+---
+# Analyzer Service - Production Deployment Specification
+# Part of Credit Contract Compliance Evaluation Platform (Phase 1)
+
+service:
+  name: aicc-analyzer
+  version: 0.1.0
+  description: Analyzer service for contract compliance evaluation
+  environment: production
+  region: us-east-1
+
+deployment:
+  compute:
+    type: fargate  # Fargate for production
+    runtime: python3.11
+    memory: 2048
+    timeout: 600
+    ephemeral_storage: 1024
+  
+  logging:
+    level: WARNING
+    format: json
+    cloudwatch_group: /aws/fargate/aicc-analyzer-prod
+    retention_days: 30
+
+application:
+  app_name: aicc-analyzer
+  app_version: 0.1.0
+  host: 0.0.0.0
+  port: 8080
+  context_path: /analyzer
+  
+  # FastAPI settings
+  api:
+    title: AICC Analyzer Service
+    description: Analyzer service for contract compliance evaluation
+    version: 0.1.0
+    docs_url: /docs
+    openapi_url: /openapi.json
+
+aws_services:
+  region: us-east-1
+  
+  # SQS Queues
+  sqs:
+    analyzer_queue: aicc-analyzer-queue-prod
+    status_queue: aicc-status-queue-prod
+    audit_queue: aicc-audit-queue-prod
+    dlq_max_receive_count: 3
+  
+  # S3 Buckets
+  s3:
+    contract_documents_bucket: aicc-contract-documents-prod
+    documents_prefix: contract-docs/
+    kms_encryption: true
+  
+  # Database
+  dynamodb:
+    execution_state_table: evaluation_execution_state_prod
+  
+  # AI Services
+  textract:
+    enabled: true
+    api_version: 2018-06-27
+  
+  bedrock:
+    enabled: true
+    model_id: anthropic.claude-3-sonnet-20240229-v1:0
+    max_tokens: 2048
+    temperature: 0.3
+
+database:
+  postgres:
+    analyzer_db:
+      host: analyzer-db-prod.c9akciq32.us-east-1.rds.amazonaws.com
+      port: 5432
+      database: analyzer_db_prod
+      username: analyzer_user
+      password: ${DB_PASSWORD}
+      min_pool_size: 5
+      max_pool_size: 20
+      ssl_mode: require
+      timeout: 10
+    
+    compliance_db:
+      host: compliance-db-prod.c9akciq32.us-east-1.rds.amazonaws.com
+      port: 5432
+      database: compliance_db_prod
+      username: compliance_user
+      password: ${DB_PASSWORD}
+      connection_timeout: 10
+
+external_services:
+  contract_service:
+    base_url: https://api.example.com/contract-service
+    timeout: 30
+    retry_attempts: 5
+    auth_type: oauth2
+  
+  document_lake:
+    base_url: https://dmp.example.com/documents
+    timeout: 60
+    retry_attempts: 5
+    auth_type: api_key
+  
+  prompt_management:
+    base_url: https://prompts.example.com/api
+    timeout: 10
+    cache_enabled: true
+
+monitoring:
+  cloudwatch:
+    enabled: true
+    metrics_namespace: AICC/Analyzer/Prod
+    detailed_monitoring: true
+  
+  xray:
+    enabled: true
+    sampling_rate: 0.1
+  
+  performance:
+    track_execution_time: true
+    track_token_usage: true
+    track_costs: true
+
+security:
+  secrets_manager:
+    enabled: true
+    rotation_enabled: true  # Enabled for production
+    rotation_days: 30
+    secret_name_prefix: aicc/analyzer/prod/
+  
+  encryption:
+    at_rest: true
+    kms_key_id: arn:aws:kms:us-east-1:ACCOUNT_ID:key/KEY_ID
+    in_transit: true
+    tls_version: "1.3"
+  
+  authentication:
+    service_to_service: jwt  # Evaluation Service to Analyzer
+    request_signing: aws_sigv4
+
+feature_flags:
+  enable_textract: true
+  enable_bedrock: true
+  enable_rule_caching: true
+  enable_document_caching: true
+  max_concurrent_analyses: 20
+  batch_processing_enabled: true
+
+phase_1_scope:
+  account_types: [TFS_RETAIL]
+  max_accounts_per_batch: 100
+  accounts_per_day_estimate: 100
+  contract_sources: [D5]
+  rule_engine: local_seed  # Not REST API yet
+
+# Health Check Configuration
+health_check:
+  interval_seconds: 15
+  timeout_seconds: 5
+  healthy_threshold: 2
+  unhealthy_threshold: 2
+  path: /health
+
+# Auto-scaling
+autoscaling:
+  enabled: true
+  min_tasks: 2
+  max_tasks: 10
+  target_cpu_utilization: 70
+  target_memory_utilization: 80
