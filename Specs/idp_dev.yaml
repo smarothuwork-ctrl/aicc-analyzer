@@ -1,0 +1,75 @@
+apiVersion: 1.0
+kind: Component
+metadata:
+  name: Contract Compliance Analyzer
+  type: aws::ecs::fargate
+  description: "Analyzer service for contract compliance evaluation"
+  annotations:
+    component_shortname: aican
+    environment: dev
+    owner: DX130
+    appcode: aican
+spec:
+  aws:
+    account_id: "106573904847"
+    rolename: ""
+    alb: {}
+    ecs:
+      regions:
+        - region: us-east-1
+          vpc_id: ""
+          subnets: []
+          security_groups: []
+          environment_variables:
+            APP_ENV: "dev"
+            AWS_REGION: "us-east-1"
+            REDIS_HOST: "contractcompliance-cache-shd4kt.serverless.use1.cache.amazonaws.com"
+            REDIS_PORT: "6379"
+            REDIS_TLS: "true"
+            EXECUTION_STATE_TABLE: "evaluation_execution_state"
+            CONTRACT_DOCUMENTS_BUCKET: "aicc-orchestrator-docs-dev"
+      cluster_name: aicc-analyzer-dev
+      service_name: aicc-analyzer-service
+      task_definition_family_name: ecs-service-1yw5yq
+      execution_role_name: aicc-ecs-task-execution-role
+      task_role_name: aicc-analyzer-task-role
+      task_cpu: 512
+      task_memory: 1024
+      desired_count: 1
+      wait_timeout: 300
+      container:
+        name: analyzer
+        port: 8080
+        environment_variables:
+          APP_ENV: "dev"
+          AWS_REGION: "us-east-1"
+          REDIS_HOST: "contractcompliance-cache-shd4kt.serverless.use1.cache.amazonaws.com"
+          REDIS_PORT: "6379"
+          REDIS_TLS: "true"
+          EXECUTION_STATE_TABLE: "evaluation_execution_state"
+          CONTRACT_DOCUMENTS_BUCKET: "aicc-orchestrator-docs-dev"
+      autoscaling:
+        enabled: ""
+        min_capacity: ""
+        max_capacity: ""
+        target_cpu_utilization: ""
+        target_memory_utilization: ""
+        scale_in_cooldown_period: ""
+        scale_out_cooldown_period: ""
+      codedeploy:
+        app_name: ""
+        deployment_group_name: ""
+        service_role_name: ""
+        strategy: ""
+      route53:
+        hosted_zone_id: ""
+        domain_name: ""
+        subdomain: ""
+        type: ""
+        record_type: ""
+        health_check:
+          alarm_name: ""
+        regions: []
+      cloudwatch:
+        log_group_name: "/ecs/aicc-analyzer/dev"
+        alarms: []

@@ -8,10 +8,8 @@ and registers API routes for the contract compliance evaluation analyzer.
 from __future__ import annotations
 
 from fastapi import FastAPI
-from fastapi.routing import APIRouter
 
 from src.settings import get_settings
-from src.api.routes import health
 
 # Initialize settings
 settings = get_settings()
@@ -32,9 +30,6 @@ app = FastAPI(
 
 # Store settings in app state for access in route handlers
 app.state.settings = settings
-
-# Include routers
-app.include_router(health.router)
 
 
 @app.get("/hi")
