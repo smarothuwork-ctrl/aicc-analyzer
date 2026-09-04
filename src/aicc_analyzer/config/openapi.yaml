@@ -1,8 +1,8 @@
 openapi: 3.0.0
 info:
-  title: contract-compliance-check-orchestrator-cccodr
-  description: orchestrator for contract compliance check
-  version: 0.1.0
+  title: aicc-analyzer
+  description: Analyzer service for contract compliance evaluation, document processing, and rule scoring.
+  version: 1.0.0
 paths:
   /:
     get:
@@ -16,3 +16,5 @@ paths:
       responses:
         '200':
           description: Service is healthy
+        '503':
+          description: Service is unhealthy

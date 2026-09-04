@@ -3,9 +3,9 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "aicc-analyzer"
+name = "aicc-evaluation-orchestrator"
 version = "0.1.0"
-description = "Analyzer service for contract compliance evaluation"
+description = "Evaluation orchestrator for the AICC contract compliance platform"
 requires-python = ">=3.11"
 dependencies = [
     "pydantic>=2.7.0",
